@@ -2,23 +2,32 @@ version: '3.8'
 
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
-      - '4000:4000'
+      - "4000:4000"
     environment:
       - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - appnet
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - '5173:80'   
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://backend:4000
+      - NODE_ENV=production
     depends_on:
       - backend
-    environment:
-      - VITE_API_BASE_URL=/api
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    networks:
+      - appnet
 
 networks:
-  default:
+  appnet:
     driver: bridge
