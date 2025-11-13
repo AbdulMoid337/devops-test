@@ -1,36 +1,24 @@
-name: CI/CD
-on:
-  push:
-    branches: [ main ]
+version: '3.8'
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+services:
+  backend:
+    build: ./backend
+    ports:
+      - '4000:4000'
+    environment:
+      - NODE_ENV=production
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+  frontend:
+    build: ./frontend
+    ports:
+      - '5173:80'   
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_BASE_URL=/api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push backend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
-
-      - name: Build and push frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
+networks:
+  default:
+    driver: bridge
