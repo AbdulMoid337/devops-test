@@ -13,7 +13,7 @@ fetch("http://localhost:4000/api/hello")
 
 return (
 <div style={{fontFamily:'Inter, system-ui', padding:20}}>
-<h1>Fron (Vite + React)</h1>
+<h1>Fronwererhrtyh (Vite + React)</h1>
 <p>{msg}</p>
 </div>
 )
